@@ -65,7 +65,7 @@ function Issues() {
             <div className="page-header">
                 <div>
                     <h1>Issues</h1>
-                    <p>Track and manage your project issues.</p>
+                    <p>Track ,manage and work with your project issues.</p>
                 </div>
 
                 {assigneeId && (
