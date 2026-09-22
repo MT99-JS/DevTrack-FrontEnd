@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { register as registerApi }
-    from "../api/authApi";
+    from "../api/AuthApi";
 
 import { useAuth }
     from "../context/AuthContext";
