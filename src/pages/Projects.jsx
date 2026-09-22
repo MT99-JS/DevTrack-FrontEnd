@@ -3,12 +3,16 @@ import { useIssues } from "../context/IssueContext";
 import { useState } from "react";
 import { useProjects } from "../context/ProjectContext";
 import Modal from "../components/common/Modal";
+import { useAuth } from "../context/AuthContext";
 
 function Projects() {
+    const { user } = useAuth();
     const { issues } = useIssues();
     const {
         projects,
-        createProject
+        loading,
+        error,
+        addProject
     } = useProjects();
 
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -25,12 +29,12 @@ function Projects() {
                     <p>Manage your projects and track progress.</p>
                 </div>
 
-                <button
+                {(user?.role === "ADMIN" || user?.role === "PROJECT_MANAGER") && (<button
                     className="primary-button"
                     onClick={() => setShowCreateModal(true)}
                 >
                     + Create Project
-                </button>
+                </button>)}
             </div>
 
             <div className="projects-grid">
@@ -38,6 +42,18 @@ function Projects() {
                     const issueCount = issues.filter(
                         issue => issue.projectId === project.id
                     ).length;
+
+                    if (loading) {
+                        return <div className="projects-page">Loading projects...</div>;
+                    }
+
+                    if (error) {
+                        return (
+                            <div className="projects-page">
+                                <p>Failed to load projects: {error}</p>
+                            </div>
+                        );
+                    }
 
                     return (
                         <ProjectCard
@@ -59,9 +75,9 @@ function Projects() {
                         onSubmit={event => {
                             event.preventDefault();
 
-                            createProject({
+                            addProject({
                                 name,
-                                key,
+                                projectKey: key,
                                 description,
                             });
 

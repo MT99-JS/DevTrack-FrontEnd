@@ -30,6 +30,10 @@ function IssueForm({ onCreateIssue, onCancel, onUpdateIssue, editingIssue }) {
         editingIssue?.assignee?.id || ""
     );
 
+    const [reporterId, setReporterId] = useState(
+        editingIssue?.assignee?.id || ""
+    );
+
     const [labels, setLabels] = useState(
         editingIssue?.labels || []
     );
@@ -48,12 +52,17 @@ function IssueForm({ onCreateIssue, onCancel, onUpdateIssue, editingIssue }) {
             member => member.id === Number(assigneeId)
         );
 
+        const selectedReporter = teamMembers.find(
+            member => member.id === Number(reporterId)
+        );
+
         const issueData = {
             title,
             description,
             type,
             priority,
-            assignee: selectedAssignee || null,
+            assigneeId: selectedAssignee.id || null,
+            reporterId: selectedReporter.id || null,
             labels,
             attachments,
             projectId: Number(projectId),
@@ -78,6 +87,10 @@ function IssueForm({ onCreateIssue, onCancel, onUpdateIssue, editingIssue }) {
 
         setAssigneeId(
             editingIssue?.assignee?.id || ""
+        );
+
+        setReporterId(
+            editingIssue?.reporter?.id || ""
         );
         setLabels(editingIssue?.labels || []);
         setLabelInput("");
@@ -280,6 +293,30 @@ function IssueForm({ onCreateIssue, onCancel, onUpdateIssue, editingIssue }) {
                         value={assigneeId}
                         onChange={(event) =>
                             setAssigneeId(event.target.value)
+                        }
+                    >
+                        <option value="">
+                            Unassigned
+                        </option>
+
+                        {teamMembers.map(member => (
+                            <option
+                                key={member.id}
+                                value={member.id}
+                            >
+                                {member.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label>Reporter</label>
+
+                    <select
+                        value={reporterId}
+                        onChange={(event) =>
+                            setReporterId(event.target.value)
                         }
                     >
                         <option value="">

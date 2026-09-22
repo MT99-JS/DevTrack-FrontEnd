@@ -19,117 +19,135 @@ import Team from "./pages/Team";
 import BoardOverview from "./pages/BoardOverview";
 import { TeamProvider } from "./context/TeamContext";
 import { ProjectProvider } from "./context/ProjectContext";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
-      <TeamProvider>
-        <ProjectProvider>
-          <IssueProvider>
+      <AuthProvider>
+        <TeamProvider>
+          <ProjectProvider>
+            <IssueProvider>
 
-            <Routes>
+              <Routes>
 
-              <Route
-                path="/"
-                element={<Navigate to="/dashboard" />}
-              />
+                <Route path="/login" element={<Login />} />
 
-              <Route
-                path="/dashboard"
-                element={
-                  <MainLayout>
-                    <Dashboard />
-                  </MainLayout>
-                }
-              />
+                <Route
+                  path="/register"
+                  element={<Register />}
+                />
 
-              <Route
-                path="/projects"
-                element={
-                  <MainLayout>
-                    <Projects />
-                  </MainLayout>
-                }
-              />
+                <Route element={<ProtectedRoute />}>
 
-              <Route
-                path="/projects/:projectId"
-                element={
-                  <MainLayout>
-                    <ProjectDetails />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/"
+                    element={<Navigate to="/dashboard" />}
+                  />
 
-              <Route
-                path="/issues"
-                element={
-                  <MainLayout>
-                    <Issues />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <MainLayout>
+                        <Dashboard />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/issues/:issueKey"
-                element={
-                  <MainLayout>
-                    <IssueDetails />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/projects"
+                    element={
+                      <MainLayout>
+                        <Projects />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/projects/:projectId/board"
-                element={
-                  <MainLayout>
-                    <Board />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/projects/:projectId"
+                    element={
+                      <MainLayout>
+                        <ProjectDetails />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/projects/:projectId/issues"
-                element={
-                  <MainLayout>
-                    <ProjectIssues />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/issues"
+                    element={
+                      <MainLayout>
+                        <Issues />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/projects/:projectId/backlog"
-                element={
-                  <MainLayout>
-                    <Backlog />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/issues/:issueKey"
+                    element={
+                      <MainLayout>
+                        <IssueDetails />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/team"
-                element={
-                  <MainLayout>
-                    <Team />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/projects/:projectId/board"
+                    element={
+                      <MainLayout>
+                        <Board />
+                      </MainLayout>
+                    }
+                  />
 
-              <Route
-                path="/board"
-                element={
-                  <MainLayout>
-                    <BoardOverview />
-                  </MainLayout>
-                }
-              />
+                  <Route
+                    path="/projects/:projectId/issues"
+                    element={
+                      <MainLayout>
+                        <ProjectIssues />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/projects/:projectId/backlog"
+                    element={
+                      <MainLayout>
+                        <Backlog />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/team"
+                    element={
+                      <MainLayout>
+                        <Team />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/board"
+                    element={
+                      <MainLayout>
+                        <BoardOverview />
+                      </MainLayout>
+                    }
+                  />
+
+                </Route>
 
 
-            </Routes>
-          </IssueProvider>
-        </ProjectProvider>
-      </TeamProvider>
+              </Routes>
+            </IssueProvider>
+          </ProjectProvider>
+        </TeamProvider>
+      </AuthProvider>
     </BrowserRouter>
+
   );
 }
 

@@ -1,91 +1,170 @@
-import { createContext, useContext, useState } from "react";
-import { issues as initialIssues } from "../data/mockData";
-import { useProjects } from "./ProjectContext";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react";
 
-const IssueContext = createContext();
+import {
+    getIssues,
+    createIssue,
+    deleteIssue,
+    updateIssue,
+    updateIssueStatus
+} from "../api/issueApi";
 
-export function IssueProvider({ children }) {
-  const [issues, setIssues] = useState(initialIssues);
-  const { projects } = useProjects();
+const IssueContext =
+    createContext();
 
-function createIssue(issueData) {
-    console.log("Issue data received by Context:", issueData);
-    console.log("Labels received:", issueData.labels);
-    const project = projects.find(
-        project => project.id === Number(issueData.projectId)
-    );
+export function IssueProvider({
+    children
+}) {
 
-    const projectIssues = issues.filter(
-        issue => issue.projectId === Number(issueData.projectId)
-    );
+    const [issues, setIssues] =
+        useState([]);
 
-  const newIssue = {
-    id: Date.now(),
+    const [loading, setLoading] =
+        useState(true);
 
-    projectId: Number(issueData.projectId),
+    const [error, setError] =
+        useState(null);
 
-    key: `${project.key}-${100 + projectIssues.length + 1}`,
+    async function loadIssues() {
 
-    title: issueData.title,
-    description: issueData.description,
-    type: issueData.type,
-    status: "TODO",
-    priority: issueData.priority,
+        try {
 
-    assignee: issueData.assignee || null,
+            setLoading(true);
 
-    reporter: {
-      id: 1,
-      name: "John Doe",
-      avatar: null,
-    },
+            const data =
+                await getIssues();
 
-    labels: issueData.labels || [],
-    attachments: issueData.attachments || [],
+            setIssues(data);
 
-  };
+        } catch (error) {
 
-  setIssues(currentIssues => [
-    ...currentIssues,
-    newIssue
-  ]);
+            setError(error.message);
+
+        } finally {
+
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        loadIssues();
+    }, []);
+
+async function addIssue(issueData) {
+    const newIssue = await createIssue(issueData);
+
+    const issue = {
+        id: newIssue.id,
+        key: newIssue.projectKey,
+        title: newIssue.title,
+        description: newIssue.description,
+        type: newIssue.type,
+        status:newIssue.status,
+        priority:newIssue.priority,
+        assignee:{
+            avatar:newIssue.assigneeAvatar,
+            name:newIssue.assigneeName
+        },
+        atatchments:newIssue.attachments
+    };
+
+    setIssues(current => [
+        ...current,
+        issue
+    ]);
 }
 
-  function updateIssue(issueId, updatedData) {
-    setIssues(currentIssues =>
-      currentIssues.map(issue =>
-        issue.id === issueId
-          ? {
-              ...issue,
-              ...updatedData,
-            }
-          : issue
-      )
-    );
-  }
+async function editIssue(issueId,issueData) {
+    const updatedIssue = await updateIssue(issueId,issueData);
 
-  function deleteIssue(issueId) {
-    setIssues(currentIssues =>
-      currentIssues.filter(
-        issue => issue.id !== issueId
-      )
-    );
-  }
+    const issue = {
+        id: updatedIssue.id,
+        key: updatedIssue.projectKey,
+        title: updatedIssue.title,
+        description: updatedIssue.description,
+        type: updatedIssue.type,
+        status:updatedIssue.status,
+        priority:updatedIssue.priority,
+        assignee:{
+            avatar:updatedIssue.assigneeAvatar,
+            name:updatedIssue.assigneeName
+        },
+        atatchments:updatedIssue.attachments
+    };
 
-  return (
-    <IssueContext.Provider
-      value={{
-        issues,
-        createIssue,
-        updateIssue,
-        deleteIssue,
-      }}
-    >
-      {children}
-    </IssueContext.Provider>
-  );
+    setIssues(current =>
+        current.map(existingIssue =>
+            existingIssue.id === issue.id
+                ? issue
+                : existingIssue
+        )
+    );
+}
+
+async function editIssueStatus(issueId,status) {
+    const updatedIssue = await updateIssueStatus(issueId,status);
+
+    const issue = {
+        id: updatedIssue.id,
+        key: updatedIssue.projectKey,
+        title: updatedIssue.title,
+        description: updatedIssue.description,
+        type: updatedIssue.type,
+        status:updatedIssue.status,
+        priority:updatedIssue.priority,
+        assignee:{
+            avatar:updatedIssue.assigneeAvatar,
+            name:updatedIssue.assigneeName
+        },
+        atatchments:updatedIssue.attachments
+    };
+
+    setIssues(current =>
+        current.map(existingIssue =>
+            existingIssue.id === issue.id
+                ? issue
+                : existingIssue
+        )
+    );
+}
+
+    async function removeIssue(
+        id
+    ) {
+
+        await deleteIssue(id);
+
+        setIssues(current =>
+            current.filter(
+                issue =>
+                    issue.id !== id
+            )
+        );
+    }
+
+    return (
+        <IssueContext.Provider
+            value={{
+                issues,
+                loading,
+                error,
+                addIssue,
+                editIssue,
+                editIssueStatus,
+                removeIssue,
+                reloadIssues:
+                    loadIssues
+            }}
+        >
+            {children}
+        </IssueContext.Provider>
+    );
 }
 
 export function useIssues() {
-  return useContext(IssueContext);
+    return useContext(IssueContext);
 }

@@ -1,10 +1,11 @@
 import StatCard from "../components/common/StatCard";
 import ProjectCard from "../components/projects/ProjectCard";
 
-import { projects } from "../data/mockData";
+import { useProjects } from "../context/ProjectContext";
 import { useIssues } from "../context/IssueContext";
 
 function Dashboard() {
+  const {projects} = useProjects();
   const { issues } = useIssues();
   const totalProjects = projects.length;
 

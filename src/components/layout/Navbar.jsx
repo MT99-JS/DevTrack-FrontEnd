@@ -1,8 +1,12 @@
+import { useAuth } from "../../context/AuthContext";
+
 function Navbar() {
+
+  const { user, logout } = useAuth();
   return (
     <header className="navbar">
       <div className="navbar-left">
-        <h3>Dashboard</h3>
+        
       </div>
 
       <div className="navbar-right">
@@ -12,13 +16,17 @@ function Navbar() {
 
         <div className="user-profile">
           <div className="avatar">
-            JD
+            {user.name.charAt(0)}
           </div>
 
           <div>
-            <strong>John Doe</strong>
-            <span>Developer</span>
+            <strong>{user.name}</strong>
+            <span>{user.role}</span>
           </div>
+
+          <button onClick={logout}>
+            Logout
+          </button>
         </div>
       </div>
     </header>

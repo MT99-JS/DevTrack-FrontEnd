@@ -1,57 +1,105 @@
-import { createContext, useContext, useState } from "react";
-import { projects as initialProjects } from "../data/mockData";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react";
 
-const ProjectContext = createContext();
+import {
+    getProjects,
+    createProject,
+    deleteProject
+} from "../api/projectApi";
 
-export function ProjectProvider({ children }) {
-  const [projects, setProjects] = useState(initialProjects);
+const ProjectContext =
+    createContext();
 
-  function createProject(projectData) {
-    const newProject = {
-      id: Date.now(),
-      key: projectData.key.toUpperCase(),
-      name: projectData.name,
-      description: projectData.description,
-      image: projectData.image || null,
-      issueCount: 0,
+export function ProjectProvider({
+    children
+}) {
+
+    const [projects, setProjects] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState(null);
+
+    async function loadProjects() {
+
+        try {
+
+            setLoading(true);
+
+            const data =
+                await getProjects();
+
+            setProjects(data);
+
+        } catch (error) {
+
+            setError(error.message);
+
+        } finally {
+
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        loadProjects();
+    }, []);
+
+async function addProject(projectData) {
+    const newProject = await createProject(projectData);
+
+    const project = {
+        id: newProject.id,
+        key: newProject.projectKey,
+        name: newProject.name,
+        description: newProject.description,
+        image: newProject.image
     };
 
-    setProjects(currentProjects => [
-      ...currentProjects,
-      newProject
+    setProjects(current => [
+        ...current,
+        project
     ]);
-  }
+}
 
-  function updateProject(projectId, updatedData) {
-    setProjects(currentProjects =>
-      currentProjects.map(project =>
-        project.id === projectId
-          ? { ...project, ...updatedData }
-          : project
-      )
+    async function removeProject(
+        id
+    ) {
+
+        await deleteProject(id);
+
+        setProjects(current =>
+            current.filter(
+                project =>
+                    project.id !== id
+            )
+        );
+    }
+
+    return (
+        <ProjectContext.Provider
+            value={{
+                projects,
+                loading,
+                error,
+                addProject,
+                removeProject,
+                reloadProjects:
+                    loadProjects
+            }}
+        >
+            {children}
+        </ProjectContext.Provider>
     );
-  }
-
-  function deleteProject(projectId) {
-    setProjects(currentProjects =>
-      currentProjects.filter(project => project.id !== projectId)
-    );
-  }
-
-  return (
-    <ProjectContext.Provider
-      value={{
-        projects,
-        createProject,
-        updateProject,
-        deleteProject,
-      }}
-    >
-      {children}
-    </ProjectContext.Provider>
-  );
 }
 
 export function useProjects() {
-  return useContext(ProjectContext);
+    return useContext(ProjectContext);
 }

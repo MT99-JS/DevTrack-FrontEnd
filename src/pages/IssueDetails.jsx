@@ -9,8 +9,10 @@ import { useState } from "react";
 import IssueForm from "../components/issues/IssueForm";
 import Modal from "../components/common/Modal";
 import { projects } from "../data/mockData";
+import { useAuth } from "../context/AuthContext";
 
 function IssueDetails() {
+    const {user} = useAuth();
     const { issueKey } = useParams();
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -74,12 +76,13 @@ function IssueDetails() {
                         Edit
                     </button>
 
+                    {(user?.role === "QA" || user?.role === "ADMIN") && (
                     <button
                         className="danger-button"
                         onClick={() => setShowDeleteModal(true)}
                     >
                         Delete
-                    </button>
+                    </button>)}
                 </div>
             </div>
 
@@ -113,7 +116,7 @@ function IssueDetails() {
                     <section className="issue-section">
                         <h2>Attachments</h2>
 
-                        {issue.attachments.length === 0 ? (
+                        {!issue.attachments || issue.attachments.length === 0  ? (
                             <p className="muted">No attachments.</p>
                         ) : (
                             <div className="issue-attachments">

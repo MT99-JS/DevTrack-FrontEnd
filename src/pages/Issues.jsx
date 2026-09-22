@@ -4,13 +4,12 @@ import IssueForm from "../components/issues/IssueForm";
 import Modal from "../components/common/Modal";
 import { useIssues } from "../context/IssueContext";
 import { useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Issues() {
+    const { user } = useAuth();
     const {
-        issues,
-        createIssue,
-        updateIssue,
-        deleteIssue
+      issues, addIssue, removeIssue, editIssue
     } = useIssues();
     const [showForm, setShowForm] = useState(false);
     const [editingIssue, setEditingIssue] = useState(null);
@@ -23,12 +22,12 @@ function Issues() {
         : issues;
 
     function handleCreateIssue(issueData) {
-        createIssue(issueData);
+        addIssue(issueData);
         setShowForm(false);
     }
 
     function handleDeleteIssue(issueId) {
-        deleteIssue(issueId);
+        removeIssue(issueId);
     }
 
     function handleEditIssue(issue) {
@@ -37,7 +36,7 @@ function Issues() {
     }
 
     function handleUpdateIssue(issueId, updatedData) {
-        updateIssue(issueId, updatedData);
+        editIssue(issueId, updatedData);
         setEditingIssue(null);
         setShowForm(false);
     }

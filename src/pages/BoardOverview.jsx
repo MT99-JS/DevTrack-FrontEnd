@@ -6,7 +6,8 @@ function BoardOverview() {
 
     const {
         issues,
-        updateIssue
+        editIssue,
+        editIssueStatus
     } = useIssues();
 
     const [draggedIssue, setDraggedIssue] = useState(null);
@@ -41,7 +42,7 @@ function BoardOverview() {
         }
 
         if (draggedIssue.status !== newStatus) {
-            updateIssue(draggedIssue.id, {
+            editIssueStatus(draggedIssue.id, {
                 status: newStatus
             });
         }

@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Sidebar() {
+  const { user } = useAuth();
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -21,9 +23,11 @@ function Sidebar() {
           🐛 Issues
         </NavLink>
 
-        <NavLink to="/team">
-          👥 Team
-        </NavLink>
+        {(user?.role === "ADMIN") &&
+          <NavLink to="/team">
+            👥 Team
+          </NavLink>
+        }
 
         <NavLink to="/board">📋 Board</NavLink>
       </nav>
